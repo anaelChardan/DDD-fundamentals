@@ -19,9 +19,6 @@ class MoneySpec extends ObjectBehavior
 
     function it_shoud_be_equals_to(Money $money1, Money $result)
     {
-//        $money1 = new Money(1, 2, 3, 4, 5, 6);
-//        $money2 = new Money(2, 4, 6, 8, 10, 12);
-
         $money1->getOneCentCount()->willReturn(1);
         $money1->getTenCentCount()->willReturn(2);
         $money1->getQuarterCount()->willReturn(3);
@@ -36,6 +33,23 @@ class MoneySpec extends ObjectBehavior
         $result->getFiveDollarCount()->willReturn(10);
         $result->getTwentyDollarCount()->willReturn(12);
 
-        $this->addMoney($money1)->shouldReturn($result);
+        $this->addMoney($money1)->shouldBeAMoneyLike($result);
+    }
+
+    public function getMatchers()
+    {
+        return [
+            'beAMoneyLike' => function (Money $result, Money $expected) {
+                return (
+                    $result->getOneCentCount() == $expected->getOneCentCount() &&
+                    $result->getTenCentCount() == $expected->getTenCentCount() &&
+                    $result->getQuarterCount() == $expected->getQuarterCount() &&
+                    $result->getOneDollarCount() == $expected->getOneDollarCount() &&
+                    $result->getFiveDollarCount() == $expected->getFiveDollarCount() &&
+                    $result->getTwentyDollarCount() == $expected->getTwentyDollarCount()
+                );
+
+            },
+        ];
     }
 }
