@@ -9,6 +9,11 @@ class AbstractEntity implements EntityInterface
      */
     protected $id;
 
+    public function __construct()
+    {
+        $this->id = uniqid();
+    }
+
     /**
      * {@inheritdoc}
      */

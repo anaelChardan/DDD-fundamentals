@@ -44,12 +44,12 @@ class Money implements ValueObjectInterface
      * @param int $twentyDollarCount
      */
     public function __construct(
-       int $oneCentCount,
-       int $tenCentCount,
-       int $quarterCount,
-       int $oneDollarCount,
-       int $fiveDollarCount,
-       int $twentyDollarCount
+        int $oneCentCount = 0,
+        int $tenCentCount = 0,
+        int $quarterCount = 0,
+        int $oneDollarCount = 0,
+        int $fiveDollarCount = 0,
+        int $twentyDollarCount = 0
     ) {
         if (
             $oneCentCount < 0 ||
@@ -71,11 +71,34 @@ class Money implements ValueObjectInterface
     }
 
     /**
+     * @return Money
+     */
+    public static function none(): Money
+    {
+        return new Money();
+    }
+
+    /**
+     * @return float
+     */
+    public function getAmount(): float
+    {
+        return (
+            $this->oneCentCount / 100 +
+            $this->tenCentCount / 100 * 10 +
+            $this->quarterCount / 100 * 25 +
+            $this->oneDollarCount +
+            $this->fiveDollarCount * 5 +
+            $this->twentyDollarCount * 20
+        );
+    }
+
+    /**
      * @param Money $money
      *
      * @return Money
      */
-    public function addMoney(Money $money)
+    public function addMoney(Money $money): Money
     {
         return new Money(
             $this->oneCentCount + $money->getOneCentCount(),
@@ -90,7 +113,7 @@ class Money implements ValueObjectInterface
     /**
      * @return int
      */
-    public function getOneCentCount()
+    public function getOneCentCount(): int
     {
         return $this->oneCentCount;
     }
@@ -98,7 +121,7 @@ class Money implements ValueObjectInterface
     /**
      * @return int
      */
-    public function getTenCentCount()
+    public function getTenCentCount(): int
     {
         return $this->tenCentCount;
     }
@@ -106,7 +129,7 @@ class Money implements ValueObjectInterface
     /**
      * @return int
      */
-    public function getQuarterCount()
+    public function getQuarterCount(): int
     {
         return $this->quarterCount;
     }
@@ -138,9 +161,99 @@ class Money implements ValueObjectInterface
     /**
      * @param Money $money
      *
+     * @return Money
+     */
+    public function substractMoney(Money $money): Money
+    {
+        if (
+            $this->oneCentCount < $money->getOneCentCount() ||
+            $this->tenCentCount < $money->getTenCentCount() ||
+            $this->quarterCount < $money->getQuarterCount() ||
+            $this->oneDollarCount < $money->getOneDollarCount() ||
+            $this->fiveDollarCount < $money->getFiveDollarCount() ||
+            $this->twentyDollarCount < $money->getTwentyDollarCount()
+        ) {
+            throw new \InvalidArgumentException('Cannot make the substraction');
+        }
+        return new Money(
+            $this->oneCentCount - $money->getOneCentCount(),
+            $this->tenCentCount - $money->getTenCentCount(),
+            $this->quarterCount - $money->getQuarterCount(),
+            $this->oneDollarCount - $money->getOneDollarCount(),
+            $this->fiveDollarCount - $money->getFiveDollarCount(),
+            $this->twentyDollarCount - $money->getTwentyDollarCount()
+        );
+    }
+
+    /**
+     * @param Money $money
+     *
      * @return bool
      */
-    public function equals(Money $money): bool
+    public static function isASimpleMoney(Money $money): bool
+    {
+        $singleMoney = [
+            Money::cent(),
+            Money::tenCent(),
+            Money::quarter(),
+            Money::dollar(),
+            Money::fiveDollar(),
+            Money::twentyDollar()
+        ];
+
+        return false !== Collection($singleMoney)->first(function (Money $current) use ($money) {
+                return $current->isEqualTo($money);
+            });
+    }
+
+    /**
+     * @return Money
+     */
+    public static function cent(): Money
+    {
+        return new Money(1);
+    }
+
+    /**
+     * @return Money
+     */
+    public static function tenCent(): Money
+    {
+        return new Money(0, 1);
+    }
+
+    /**
+     * @return Money
+     */
+    public static function quarter(): Money
+    {
+        return new Money(0, 0, 1);
+    }
+
+    /**
+     * @return Money
+     */
+    public static function dollar(): Money
+    {
+        return new Money(0, 0, 0, 1);
+    }
+
+    public static function fiveDollar(): Money
+    {
+        return new Money(0, 0, 0, 0, 1);
+    }
+
+    public static function twentyDollar(): Money
+    {
+        return new Money(0, 0, 0, 0, 0, 1);
+    }
+
+    /**
+     * @param Money $money
+     *
+     * @return bool
+     */
+    public function isEqualTo(Money $money): bool
     {
         return (
             $this->oneCentCount == $money->getOneCentCount() &&
