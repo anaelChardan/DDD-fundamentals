@@ -17,7 +17,7 @@ class MoneySpec extends ObjectBehavior
         $this->shouldBeAnInstanceOf(Money::class);
     }
 
-    public function it_should_do_the_addition_correctly(Money $money1, Money $result)
+    public function it_should_do_the_addition_correctly(Money $money1)
     {
         $money1->getOneCentCount()->willReturn(1);
         $money1->getTenCentCount()->willReturn(2);
@@ -26,17 +26,12 @@ class MoneySpec extends ObjectBehavior
         $money1->getFiveDollarCount()->willReturn(5);
         $money1->getTwentyDollarCount()->willReturn(6);
 
-        $result->getOneCentCount()->willReturn(2);
-        $result->getTenCentCount()->willReturn(4);
-        $result->getQuarterCount()->willReturn(6);
-        $result->getOneDollarCount()->willReturn(8);
-        $result->getFiveDollarCount()->willReturn(10);
-        $result->getTwentyDollarCount()->willReturn(12);
+        $result = new Money(2, 4, 6, 8, 10, 12);
 
         $this->addMoney($money1)->shouldBeAMoneyLike($result);
     }
 
-    public function it_should_do_the_substraction_correctly(Money $money1, Money $result)
+    public function it_should_do_the_substraction_correctly(Money $money1)
     {
         $money1->getOneCentCount()->willReturn(1);
         $money1->getTenCentCount()->willReturn(2);
@@ -45,12 +40,7 @@ class MoneySpec extends ObjectBehavior
         $money1->getFiveDollarCount()->willReturn(5);
         $money1->getTwentyDollarCount()->willReturn(6);
 
-        $result->getOneCentCount()->willReturn(0);
-        $result->getTenCentCount()->willReturn(0);
-        $result->getQuarterCount()->willReturn(0);
-        $result->getOneDollarCount()->willReturn(0);
-        $result->getFiveDollarCount()->willReturn(0);
-        $result->getTwentyDollarCount()->willReturn(0);
+        $result = Money::none();
 
         $this->substractMoney($money1)->shouldBeAMoneyLike($result);
     }
